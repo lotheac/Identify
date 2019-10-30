@@ -38,11 +38,11 @@ function Identify.HandleAuraTooltip(tooltip, unit, slot, auratype)
 end
 
 function Identify.HandleBuffTooltip(tooltip, unit, slot)
-  Identify:HandleAuraTooltip(tooltip, unit, slot, "HELPFUL")
+  Identify.HandleAuraTooltip(tooltip, unit, slot, "HELPFUL")
 end
 
 function Identify.HandleDebuffTooltip(tooltip, unit, slot)
-  Identify:HandleAuraTooltip(tooltip, unit, slot, "HARMFUL")
+  Identify.HandleAuraTooltip(tooltip, unit, slot, "HARMFUL")
 end
 
 function Identify.HandleSpellTooltip(tooltip)
