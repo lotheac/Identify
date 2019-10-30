@@ -2,7 +2,7 @@
 local Identify = CreateFrame("Frame", "Identify", UIParent)
 Identify:RegisterEvent("ADDON_LOADED")
 
-local function AddDoubleLine(tooltip, left, right)
+function Identify:ModifyTooltip(tooltip, left, right)
   -- this is inefficient, but not sure of a better way to avoid duplicate lines
   -- than scanning the entire thing...
   local found = false
@@ -22,7 +22,11 @@ local function AddDoubleLine(tooltip, left, right)
   end
 end
 
-local function HandleAuraTooltip(tooltip, unit, slot, auratype)
+function Identify:AddOnlyId(tooltip, id)
+  self:ModifyTooltip(tooltip, " ", tostring(id))
+end
+
+function Identify.HandleAuraTooltip(tooltip, unit, slot, auratype)
   local src, _, _, id = select(7, UnitAura(unit, slot, auratype))
   if (src) then
     local _, class = UnitClass(src)
@@ -30,49 +34,45 @@ local function HandleAuraTooltip(tooltip, unit, slot, auratype)
   else
     src = " "
   end
-  AddDoubleLine(tooltip, src, tostring(id))
+  Identify:ModifyTooltip(tooltip, src, tostring(id))
 end
 
-local function HandleBuffTooltip(tooltip, unit, slot)
-  HandleAuraTooltip(tooltip, unit, slot, "HELPFUL")
+function Identify.HandleBuffTooltip(tooltip, unit, slot)
+  Identify:HandleAuraTooltip(tooltip, unit, slot, "HELPFUL")
 end
 
-local function HandleDebuffTooltip(tooltip, unit, slot)
-  HandleAuraTooltip(tooltip, unit, slot, "HARMFUL")
+function Identify.HandleDebuffTooltip(tooltip, unit, slot)
+  Identify:HandleAuraTooltip(tooltip, unit, slot, "HARMFUL")
 end
 
-local function AddOnlyId(tooltip, id)
-  AddDoubleLine(tooltip, " ", tostring(id))
-end
-
-local function HandleSpellTooltip(tooltip)
+function Identify.HandleSpellTooltip(tooltip)
   local _, id = tooltip:GetSpell()
-  AddOnlyId(tooltip, id)
+  Identify:AddOnlyId(tooltip, id)
 end
 
-local function HandleItemRef(link)
+function Identify.HandleItemRef(link)
   local match = link:match("spell:(%d+)") or link:match("item:(%d+)")
   if match then
-    AddOnlyId(ItemRefTooltip, match)
+    Identify:AddOnlyId(ItemRefTooltip, match)
   end
 end
 
-local function HandleItemTooltip(tooltip)
+function Identify.HandleItemTooltip(tooltip)
   local _, link = tooltip:GetItem()
   local match = link:match("item:(%d+)")
   if match then
-    AddOnlyId(tooltip, match)
+    Identify:AddOnlyId(tooltip, match)
   end
 end
 
 function Identify:InitAddon()
-  hooksecurefunc(GameTooltip, "SetUnitAura", HandleAuraTooltip)
-  hooksecurefunc(GameTooltip, "SetUnitBuff", HandleBuffTooltip)
-  hooksecurefunc(GameTooltip, "SetUnitDebuff", HandleDebuffTooltip)
+  hooksecurefunc(GameTooltip, "SetUnitAura", self.HandleAuraTooltip)
+  hooksecurefunc(GameTooltip, "SetUnitBuff", self.HandleBuffTooltip)
+  hooksecurefunc(GameTooltip, "SetUnitDebuff", self.HandleDebuffTooltip)
 
-  GameTooltip:HookScript("OnTooltipSetSpell", HandleSpellTooltip)
-  GameTooltip:HookScript("OnTooltipSetItem", HandleItemTooltip)
-  hooksecurefunc("SetItemRef", HandleItemRef)
+  GameTooltip:HookScript("OnTooltipSetSpell", self.HandleSpellTooltip)
+  GameTooltip:HookScript("OnTooltipSetItem", self.HandleItemTooltip)
+  hooksecurefunc("SetItemRef", self.HandleItemRef)
 end
 
 Identify:SetScript("OnEvent", Identify.InitAddon)
