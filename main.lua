@@ -1,5 +1,5 @@
 -- vim: sw=2 sts=2 et
-local Identify = CreateFrame("Frame", "ad", UIParent)
+local Identify = CreateFrame("Frame", "Identify", UIParent)
 Identify:RegisterEvent("ADDON_LOADED")
 
 local function AddDoubleLine(tooltip, left, right)
