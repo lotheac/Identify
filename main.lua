@@ -59,6 +59,7 @@ end
 
 function Identify.HandleItemTooltip(tooltip)
   local _, link = tooltip:GetItem()
+  if not link then return end
   local match = link:match("item:(%d+)")
   if match then
     Identify:AddOnlyId(tooltip, match)
