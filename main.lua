@@ -23,7 +23,9 @@ function Identify:ModifyTooltip(tooltip, left, right)
 end
 
 function Identify:AddOnlyId(tooltip, id)
-  self:ModifyTooltip(tooltip, " ", tostring(id))
+  if id then
+    self:ModifyTooltip(tooltip, " ", tostring(id))
+  end
 end
 
 function Identify.HandleAuraTooltip(tooltip, unit, slot, auratype)
@@ -52,18 +54,14 @@ end
 
 function Identify.HandleItemRef(link)
   local match = link:match("spell:(%d+)") or link:match("item:(%d+)")
-  if match then
-    Identify:AddOnlyId(ItemRefTooltip, match)
-  end
+  Identify:AddOnlyId(ItemRefTooltip, match)
 end
 
 function Identify.HandleItemTooltip(tooltip)
   local _, link = tooltip:GetItem()
   if not link then return end
   local match = link:match("item:(%d+)")
-  if match then
-    Identify:AddOnlyId(tooltip, match)
-  end
+  Identify:AddOnlyId(tooltip, match)
 end
 
 function Identify:InitAddon()
